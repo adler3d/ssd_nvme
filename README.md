@@ -11,5 +11,8 @@ set_env.bat
 build.bat
 </pre>
 
-also:
+also: 
 open "mmc.exe" and then import ssd_nvme_tracker.xml
+
+<b>output_file:</b>
+`C:\Program Files\ssd_nvme\nvme_main.log`
