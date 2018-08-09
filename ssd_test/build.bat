@@ -1,0 +1,1 @@
+cl ssd_test.cpp /O2 /EHsc /nologo /std:c++17
