@@ -10,3 +10,6 @@ cd ssd_nvme
 set_env.bat
 build.bat
 </pre>
+
+also:
+open "mmc.exe" and then import ssd_nvme_tracker.xml
