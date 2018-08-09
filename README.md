@@ -1,8 +1,8 @@
 # ssd_nvme
 Cmdline "Data Units Written" tracker for SSD with NVM Express
 
+open cmd.exe with admin:
 <pre>
-1) open cmd.exe with admin
-`cd c:\Program Files\`
-`git clone https://github.com/adler3d/ssd_nvme.git`
+cd c:\Program Files\
+git clone https://github.com/adler3d/ssd_nvme.git
 </pre>
