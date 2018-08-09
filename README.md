@@ -17,7 +17,7 @@ open "mmc.exe" and then import ssd_nvme_tracker.xml
 <b>output_file:</b> 
 `C:\Program Files\ssd_nvme\nvme_main.log`
 
-<b>example:</b>  
+<b>output_file example:</b>  
 <pre>
 10.08.2018 
 00:37
