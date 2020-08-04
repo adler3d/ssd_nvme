@@ -19,6 +19,8 @@ L.map(e=>{
     var rec={d,t,rd_gb,wd_gb};getdef(d2i,d,[]).push(rec);out.push(rec);
   }
 });
+var argv=process.argv;
+if(argv.length==3&&argv[2]=="debug"){console.log(out.map(json).join("\n"));process.exit();}
 mapkeys(d2i).map(d=>{
   var q=d2i[d];var f=v=>v.toFixed(3);
   d2i[d]={d,n:q.length,rd_gb:f(qapsum(q,e=>e.rd_gb)),wd_gb:f(qapsum(q,e=>e.wd_gb))}
