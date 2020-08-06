@@ -227,8 +227,8 @@ const requestListener = function (request, res) {
     res.end(html('<html><body><center>'+s+'</body></hmtl>'));
   }
   if("/ssd_nvme"==uri){
-    var s=""+execSync('node read.js reverse=true tail_n=100 mode=by_recs');
-    res.writeHead(200);res.end(maps2table(s.split("\n").filter(e=>e.trim().length).map(e=>JSON.parse(e))));
+    var s=""+execSync('node read.js tail_n=100 mode=by_recs');
+    res.writeHead(200);res.end(maps2table(s.split("\n").reverse().filter(e=>e.trim().length).map(e=>JSON.parse(e))));
   }
   res.writeHead(404);res.end('not found');
 }
