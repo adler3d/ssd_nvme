@@ -193,19 +193,19 @@ const requestListener = function (request, res) {
     );
   }
   if("/pslist"==uri){
-    res.writeHead(200);res.end(""+execSync("pslist -m -nobanner"));
+    res.writeHead(200);res.end(""+execSync("../ps/pslist -m -nobanner"));
   }
   if("/pslist/html"==uri){
-    res.writeHead(200);res.end(maps2table(pslist2json(""+execSync("pslist -m -nobanner"))));
+    res.writeHead(200);res.end(maps2table(pslist2json(""+execSync("../ps/pslist -m -nobanner"))));
   }
   if("/pslist/json"==uri){
-    res.writeHead(200);res.end(json(pslist2json(""+execSync("pslist -m -nobanner")),0,2));
+    res.writeHead(200);res.end(json(pslist2json(""+execSync("../ps/pslist -m -nobanner")),0,2));
   }
   if("/pssuspend/s/firefox"==uri){
-    res.writeHead(200);res.end(""+execSync("pssuspend.exe firefox.exe -nobanner"));
+    res.writeHead(200);res.end(""+execSync("../ps/pssuspend.exe firefox.exe -nobanner"));
   }
   if("/pssuspend/r/firefox"==uri){
-    res.writeHead(200);res.end(""+execSync("pssuspend.exe -r firefox.exe -nobanner"));
+    res.writeHead(200);res.end(""+execSync("../ps/pssuspend.exe -r firefox.exe -nobanner"));
   }
   if("/GUI"==uri){
     res.writeHead(200);
@@ -227,7 +227,7 @@ const requestListener = function (request, res) {
     res.end(html('<html><body><center>'+s+'</body></hmtl>'));
   }
   if("/ssd_nvme"==uri){
-    var s=""+execSync('node read.js tail_k=0.99 mode=by_recs');
+    var s=""+execSync('node read.js tail_k=0.995 tail_min=32000 tail_max=99000 mode=by_recs');
     res.writeHead(200);res.end(maps2table(s.split("\n").reverse().filter(e=>e.trim().length).map(e=>JSON.parse(e))));
   }
   res.writeHead(404);res.end('not found');
