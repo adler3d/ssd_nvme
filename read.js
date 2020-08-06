@@ -1,15 +1,20 @@
-var qp={mode:"by_days",tail_k:"0",fn:'nvme_main.log'};process.argv.slice(2).map(e=>e.split("=")).map(e=>qp[e[0]]=e.length<2?"true":e[1]);
+var qp={mode:"by_days",tail_k:"0",tail_min:32000,tail_max:99000,fn:'nvme_main.log'};
+process.argv.slice(2).map(e=>e.split("=")).map(e=>qp[e[0]]=e.length<2?"true":e[1]);
 var fs=require('fs');
 var getdef=(m,k,def)=>{if(!(k in m))m[k]=def;return m[k];};
 var qapsum=(arr,cb)=>{if(typeof cb=='undefined')cb=e=>e;return arr.reduce((pv,ex)=>pv+cb(ex),0);}
 var json=JSON.stringify;
 var mapkeys=Object.keys;var mapvals=(m)=>mapkeys(m).map(k=>m[k]);
 var rev=e=>e.trim().split(".").reverse().join(".");
-var tail=(fn,k)=>{
+var tail=(fn,k,min,max)=>{
   return new Promise((resolve,reject)=>{
     var all=fs.statSync(fn).size;
     var pos=(k*all)|0;
-    process.stderr.write(JSON.stringify({fn,k,all,pos,dpos:all-pos})+'\n');
+    var dpos=all-pos;
+    if(dpos<min){dpos=min;pos=all-dpos;}
+    if(dpos>max){dpos=max;pos=all-dpos;}
+    if(pos<0)pos=0;if(pos>all)return reject("no way");
+    process.stderr.write(JSON.stringify({fn,k,all,pos,dpos})+'\n');
     var arr=[];
     var rs=fs.createReadStream(fn,{start:pos});
     rs.on('data',chunk=>arr.push(chunk));
@@ -19,7 +24,7 @@ var tail=(fn,k)=>{
 }
 var k=parseFloat(qp.tail_k);
 var main=async()=>{
-  var str=""+(k?await tail(qp.fn,k):fs.readFileSync(qp.fn));
+  var str=""+(k?await tail(qp.fn,k,qp.tail_min,qp.tail_max):fs.readFileSync(qp.fn));
   var qqq=str;//.substr(str.indexOf(rev("2020.04.23")));
   var L=qqq.split("\r").join("").split("\n");
   var out=[];
