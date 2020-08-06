@@ -7,6 +7,7 @@ var mapkeys=Object.keys;var mapvals=(m)=>mapkeys(m).map(k=>m[k]);
 var rev=e=>e.trim().split(".").reverse().join(".");
 var tail=(fn,k)=>{
   var all=fs.statSync(fn).size;
+  process.stderr.write(JSON.stringify({fn,k,all,pos,dpos:all-pos})+'\n');
   var f=fs.openSync(fn,'r');
   var pos=(k*all)|0;
   var buf=Buffer.alloc(all-pos);
