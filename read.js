@@ -14,7 +14,7 @@ var tail=(fn,k)=>{
     var rs=fs.createReadStream(fn,{start:pos});
     rs.on('data',chunk=>arr.push(chunk));
     rs.on('end',()=>resolve(Buffer.concat(arr)));
-    rs.on('error',err=>reject(throw new Error(err)));
+    rs.on('error',err=>reject(err));
   });
 }
 var k=parseFloat(qp.tail_k);
