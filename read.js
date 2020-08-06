@@ -11,10 +11,10 @@ var tail=(fn,k)=>{
     var pos=(k*all)|0;
     process.stderr.write(JSON.stringify({fn,k,all,pos,dpos:all-pos})+'\n');
     var arr=[];
-    var rs=fs.createReadStream("myfile.txt",{start:pos});
+    var rs=fs.createReadStream(fn,{start:pos});
     rs.on('data',chunk=>arr.push(chunk));
     rs.on('end',()=>resolve(Buffer.concat(arr)));
-    rs.on('error',err=>reject(err));
+    rs.on('error',err=>reject(throw new Error(err)));
   });
 }
 var k=parseFloat(qp.tail_k);
