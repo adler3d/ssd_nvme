@@ -10,7 +10,6 @@ set_env.bat
 build.bat
 ```
 
-also: 
 open <code>mmc.exe</code> and then import <code>ssd_nvme_tracker.xml</code>
 
 <b>output_file:</b> 
