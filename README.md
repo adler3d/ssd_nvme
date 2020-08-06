@@ -3,7 +3,7 @@ Cmdline <code>Data Units Written</code> tracker for SSD with NVM Express
 
 open <code>"cmd.exe"</code> with admin privileges and then do this:
 ```bat
-cd c:\Program Files\
+cd "c:\Program Files\"
 git clone https://github.com/adler3d/ssd_nvme.git
 cd ssd_nvme
 set_env.bat
