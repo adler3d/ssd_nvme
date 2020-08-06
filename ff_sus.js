@@ -192,20 +192,21 @@ const requestListener = function (request, res) {
       ).filter(e=>hide.indexOf(e)<0).map(e=>'/'+e))
     );
   }
+  var run=fn=>""+execSync(path.normalize("../ps/"+fn));
   if("/pslist"==uri){
-    res.writeHead(200);res.end(""+execSync("../ps/pslist -m -nobanner"));
+    res.writeHead(200);res.end(run("pslist -m -nobanner"));
   }
   if("/pslist/html"==uri){
-    res.writeHead(200);res.end(maps2table(pslist2json(""+execSync("../ps/pslist -m -nobanner"))));
+    res.writeHead(200);res.end(maps2table(pslist2json(run("pslist -m -nobanner"))));
   }
   if("/pslist/json"==uri){
-    res.writeHead(200);res.end(json(pslist2json(""+execSync("../ps/pslist -m -nobanner")),0,2));
+    res.writeHead(200);res.end(json(pslist2json(run("pslist -m -nobanner")),0,2));
   }
   if("/pssuspend/s/firefox"==uri){
-    res.writeHead(200);res.end(""+execSync("../ps/pssuspend.exe firefox.exe -nobanner"));
+    res.writeHead(200);res.end(run("pssuspend.exe firefox.exe -nobanner"));
   }
   if("/pssuspend/r/firefox"==uri){
-    res.writeHead(200);res.end(""+execSync("../ps/pssuspend.exe -r firefox.exe -nobanner"));
+    res.writeHead(200);res.end(run("pssuspend.exe -r firefox.exe -nobanner"));
   }
   if("/GUI"==uri){
     res.writeHead(200);
