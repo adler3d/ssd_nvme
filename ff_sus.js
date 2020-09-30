@@ -184,6 +184,7 @@ const requestListener = function (request, res) {
   let purl=url.parse(request.url);let uri=purl.pathname;let qp=qs.parse(purl.query);
   let full_html=s=>'<!DOCTYPE HTML><html><head><meta charset="utf-8"></head>'+s+'</html>';
   let html=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/html"});r.end(full_html(s));}})(res);
+  let html_body=s=>html("<body>"+s+"</body>");
   let txt=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/plain"});r.end(s);}})(res);
   if(purl.path!=="/"+"favicon.ico")qap_log("url = "+purl.path);
   if("/sitemap"==uri){
@@ -200,7 +201,7 @@ const requestListener = function (request, res) {
     return txt(run("pslist -m -nobanner"));
   }
   if("/pslist/html"==uri){
-    return txt(maps2table(pslist2json(run("pslist -m -nobanner"))));
+    return html_body(maps2table(pslist2json(run("pslist -m -nobanner"))));
   }
   if("/pslist/json"==uri){
     return txt(json(pslist2json(run("pslist -m -nobanner")),0,2));
@@ -235,7 +236,7 @@ const requestListener = function (request, res) {
     let btn=v=>'<button onclick="func('+v+')">PROC_THROTTLE_MAX = '+v+'</button>';
     let btns=[100,75,50,37,20].map(e=>btn(e)).join("\n<br><br>");
     s+=btns;
-    return html('<body><center>response: <pre id="out">...</pre><br><br>'+s+'</center></body>');
+    return html_body('<center>response: <pre id="out">...</pre><br><br>'+s+'</center>');
   }
   if("/pssuspend/s/firefox"==uri){
     return txt(run("pssuspend.exe firefox.exe -nobanner"));
@@ -258,16 +259,16 @@ const requestListener = function (request, res) {
     }</style>
     <button onclick="start()">START</button>
     <br><br><br>
-    <button onclick="stop()">STOP</button></center>`;
-    return html('<body><center>'+s+'</body>');
+    <button onclick="stop()">STOP</button>`;
+    return html_body('<center>'+s+'</center>');
   }
   if("/ssd_nvme"==uri){
     let s=""+execSync('node read.js tail_k=0.995 tail_min=32000 tail_max=99000 mode=by_recs');
-    return html(maps2table(s.split("\n").reverse().filter(e=>e.trim().length).map(e=>JSON.parse(e))));
+    return html_body(maps2table(s.split("\n").reverse().filter(e=>e.trim().length).map(e=>JSON.parse(e))));
   }
   if("/ssd_nvme_full"==uri){
     let s=""+execSync('node read.js');
-    return html(maps2table(s.split("\n").reverse().filter(e=>e.trim().length).map(e=>JSON.parse(e))));
+    return html_body(maps2table(s.split("\n").reverse().filter(e=>e.trim().length).map(e=>JSON.parse(e))));
   }
   res.writeHead(404);res.end('not found');
 }
