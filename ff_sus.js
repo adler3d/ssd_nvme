@@ -204,7 +204,6 @@ const requestListener = function (request, res) {
     res.writeHead(200);res.end(json(pslist2json(run("pslist -m -nobanner")),0,2));
   }
   if("/set_cpu_maxpower"==uri){
-    var execSync=require('child_process').execSync;
     var v=qp.v|0;if(v<20)v=20;if(v>100)v=100;
     execSync("Powercfg -setacvalueindex scheme_current sub_processor PROCTHROTTLEMAX "+v);
     execSync("Powercfg -setactive scheme_current");
