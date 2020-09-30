@@ -206,6 +206,7 @@ const requestListener = function (request, res) {
     return txt(json(pslist2json(run("pslist -m -nobanner")),0,2));
   }
   if("/set_cpu_maxpower"==uri){
+
     if('v' in qp){
       let v=qp.v|0;if(v<20)v=20;if(v>100)v=100;
       execSync("Powercfg -setacvalueindex scheme_current sub_processor PROCTHROTTLEMAX "+v);
@@ -214,8 +215,13 @@ const requestListener = function (request, res) {
       console.log(msg);
       return txt(msg);
     }
-    let s="";
-    s+="<script>var f=(api)=>fetch(api);var func=v=>f('/set_cpu_maxpower?v='+v);</script>";
+    let s=(
+      `<script>
+        var byid=id=>document.getElementById(id);
+        var f=(api)=>fetch(api).then((resp)=>{resp.text().then(s=>{byid('out').textContent=s;});});
+        var func=v=>f('/set_cpu_maxpower?v='+v);
+      </script>`
+    );
     s+=`<style>button{
       display: block;
       width: 50%;
@@ -229,7 +235,7 @@ const requestListener = function (request, res) {
     let btn=v=>'<button onclick="func('+v+')">PROC_THROTTLE_MAX = '+v+'</button>';
     let btns=[100,75,50,37,20].map(e=>btn(e)).join("\n<br><br>");
     s+=btns;
-    return html('<body><center>'+s+'</center></body>');
+    return html('<body><center>response: <pre id="out">...</pre><br><br>'+s+'</center></body>');
   }
   if("/pssuspend/s/firefox"==uri){
     return txt(run("pssuspend.exe firefox.exe -nobanner"));
