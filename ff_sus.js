@@ -182,7 +182,8 @@ var pslist2json=s=>{
 
 const requestListener = function (request, res) {
   var purl=url.parse(request.url);var uri=purl.pathname;var qp=qs.parse(purl.query);
-  var html=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/html"});r.end(s);}})(res);
+  var full_html=s=>'<!DOCTYPE HTML><html><head><meta charset="utf-8"></head>'+s+'</html>';
+  var html=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/html"});r.end(full_html(s));}})(res);
   var txt=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/plain"});r.end(s);}})(res);
   if(purl.path!=="/"+"favicon.ico")qap_log("url = "+purl.path);
   if("/sitemap"==uri){
@@ -213,7 +214,7 @@ const requestListener = function (request, res) {
       console.log(msg);
       return txt(msg);
     }
-    var s="";
+    let s="";
     s+="<script>var f=(api)=>()=>fetch(api);var func=v=>f('/set_cpu_maxpower?v='+v);";
     s+=`<style>button{
       display: block;
@@ -225,10 +226,10 @@ const requestListener = function (request, res) {
       cursor: pointer;
       text-align: center;
     }</style>`;
-    var btn=v=>'<button onclick="func('+v+')">PROC_THROTTLE_MAX = '+v+'</button>';
-    var btns=[100,75,50,37,20].map(e=>btn(e)).join("<br><br>");
+    let btn=v=>'<button onclick="func('+v+')">PROC_THROTTLE_MAX = '+v+'</button>';
+    let btns=[100,75,50,37,20].map(e=>btn(e)).join("\n<br><br>");
     s+=btns;
-    return html('<html><body><center>'+s+'</center></body></hmtl>');
+    return html('<body><center>'+s+'</center></body>');
   }
   if("/pssuspend/s/firefox"==uri){
     return txt(run("pssuspend.exe firefox.exe -nobanner"));
@@ -252,7 +253,7 @@ const requestListener = function (request, res) {
     <button onclick="start()">START</button>
     <br><br><br>
     <button onclick="stop()">STOP</button></center>`;
-    return html('<html><body><center>'+s+'</body></hmtl>');
+    return html('<body><center>'+s+'</body>');
   }
   if("/ssd_nvme"==uri){
     var s=""+execSync('node read.js tail_k=0.995 tail_min=32000 tail_max=99000 mode=by_recs');
