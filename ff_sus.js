@@ -215,7 +215,7 @@ const requestListener = function (request, res) {
       return txt(msg);
     }
     let s="";
-    s+="<script>var f=(api)=>()=>fetch(api);var func=v=>f('/set_cpu_maxpower?v='+v);";
+    s+="<script>var f=(api)=>()=>fetch(api);var func=v=>f('/set_cpu_maxpower?v='+v);</script>";
     s+=`<style>button{
       display: block;
       width: 50%;
