@@ -16,7 +16,7 @@ var http = require("http"),
     process = require('process'),
     crypto = require('crypto');
 
-var getDateTime=t=>{
+var getDateTime_v2=t=>{
   var now     = typeof t==='number'?new Date(t):new Date();
   var year    = now.getFullYear();
   var f=v=>(v.toString().length==1?'0':'')+v;
@@ -24,12 +24,13 @@ var getDateTime=t=>{
   var day     = f(now.getDate());
   var hour    = f(now.getHours());
   var minute  = f(now.getMinutes());
-  var second  = f(now.getSeconds()); 
-  var dateTime = year+'.'+month+'.'+day+' '+hour+':'+minute+':'+second;   
+  var second  = f(now.getSeconds());
+  var ms=now.getMilliseconds()+"";var ttt=[0,"00","0",""];ms=ttt[ms.length]+ms;
+  var dateTime = year+'.'+month+'.'+day+' '+hour+':'+minute+':'+second+'.'+ms;
   return dateTime;
 }
 
-var qap_add_time=s=>"["+getDateTime()+"] "+s;
+var qap_add_time=s=>"["+getDateTime_v2()+"] "+s;
 var qap_log=s=>console.log(qap_add_time(s));
 
 var json=JSON.stringify;
@@ -202,6 +203,14 @@ const requestListener = function (request, res) {
   if("/pslist/json"==uri){
     res.writeHead(200);res.end(json(pslist2json(run("pslist -m -nobanner")),0,2));
   }
+  if("/set_cpu_maxpower"==uri){
+    var execSync=require('child_process').execSync;
+    var v=qp.v|0;if(v<20)v=20;if(v>100)v=100;
+    execSync("Powercfg -setacvalueindex scheme_current sub_processor PROCTHROTTLEMAX "+v);
+    execSync("Powercfg -setactive scheme_current");
+    console.log("["+getDateTime_v2()+"]: PROCTHROTTLEMAX = "+v);
+    res.writeHead(200);res.end("PROCTHROTTLEMAX = "+v);
+  }
   if("/pssuspend/s/firefox"==uri){
     res.writeHead(200);res.end(run("pssuspend.exe firefox.exe -nobanner"));
   }
@@ -229,6 +238,10 @@ const requestListener = function (request, res) {
   }
   if("/ssd_nvme"==uri){
     var s=""+execSync('node read.js tail_k=0.995 tail_min=32000 tail_max=99000 mode=by_recs');
+    res.writeHead(200);res.end(maps2table(s.split("\n").reverse().filter(e=>e.trim().length).map(e=>JSON.parse(e))));
+  }
+  if("/ssd_nvme_full"==uri){
+    var s=""+execSync('node read.js');
     res.writeHead(200);res.end(maps2table(s.split("\n").reverse().filter(e=>e.trim().length).map(e=>JSON.parse(e))));
   }
   res.writeHead(404);res.end('not found');
