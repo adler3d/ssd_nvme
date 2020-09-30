@@ -183,6 +183,7 @@ var pslist2json=s=>{
 const requestListener = function (request, res) {
   var purl=url.parse(request.url);var uri=purl.pathname;var qp=qs.parse(purl.query);
   var html=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/html"});r.end(s);}})(res);
+  var txt=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/plain"});r.end(s);}})(res);
   if(purl.path!=="/"+"favicon.ico")qap_log("url = "+purl.path);
   if("/sitemap"==uri){
     var hide="close,exit,inc,dec,del,put,get,internal,eval,tick,ping".split(",").concat("g,");
@@ -195,29 +196,47 @@ const requestListener = function (request, res) {
   }
   var run=fn=>""+execSync(path.normalize("../ps/"+fn));
   if("/pslist"==uri){
-    res.writeHead(200);res.end(run("pslist -m -nobanner"));
+    return txt(run("pslist -m -nobanner"));
   }
   if("/pslist/html"==uri){
-    res.writeHead(200);res.end(maps2table(pslist2json(run("pslist -m -nobanner"))));
+    return txt(maps2table(pslist2json(run("pslist -m -nobanner"))));
   }
   if("/pslist/json"==uri){
-    res.writeHead(200);res.end(json(pslist2json(run("pslist -m -nobanner")),0,2));
+    return txt(json(pslist2json(run("pslist -m -nobanner")),0,2));
   }
   if("/set_cpu_maxpower"==uri){
-    var v=qp.v|0;if(v<20)v=20;if(v>100)v=100;
-    execSync("Powercfg -setacvalueindex scheme_current sub_processor PROCTHROTTLEMAX "+v);
-    execSync("Powercfg -setactive scheme_current");
-    console.log("["+getDateTime_v2()+"]: PROCTHROTTLEMAX = "+v);
-    res.writeHead(200);res.end("PROCTHROTTLEMAX = "+v);
+    if('v' in qp){
+      var v=qp.v|0;if(v<20)v=20;if(v>100)v=100;
+      execSync("Powercfg -setacvalueindex scheme_current sub_processor PROCTHROTTLEMAX "+v);
+      execSync("Powercfg -setactive scheme_current");
+      var msg="["+getDateTime_v2()+"]: PROCTHROTTLEMAX = "+v;
+      console.log(msg);
+      return txt(msg);
+    }
+    var s="";
+    s+="<script>var f=(api)=>()=>fetch(api);var func=v=>f('/set_cpu_maxpower?v='+v);";
+    s+=`<style>button{
+      display: block;
+      width: 50%;
+      border: none;
+      background-color: #AF4C50;
+      padding: 14px 28px;
+      font-size: 48px;
+      cursor: pointer;
+      text-align: center;
+    }</style>`;
+    var btn=v=>'<button onclick="func('+v+')">PROC_THROTTLE_MAX = '+v+'</button>';
+    var btns=[100,75,50,37,20].map(e=>btn(e)).join("<br><br>");
+    s+=btns;
+    return html('<html><body><center>'+s+'</center></body></hmtl>');
   }
   if("/pssuspend/s/firefox"==uri){
-    res.writeHead(200);res.end(run("pssuspend.exe firefox.exe -nobanner"));
+    return txt(run("pssuspend.exe firefox.exe -nobanner"));
   }
   if("/pssuspend/r/firefox"==uri){
-    res.writeHead(200);res.end(run("pssuspend.exe -r firefox.exe -nobanner"));
+    return txt(run("pssuspend.exe -r firefox.exe -nobanner"));
   }
   if("/GUI"==uri){
-    res.writeHead(200);
     var s="";
     s+="<script>var f=(api)=>()=>fetch(api);var start=f('/pssuspend/r/firefox');var stop=f('/pssuspend/s/firefox');</script>";
     s+=`<style>button{
@@ -233,15 +252,15 @@ const requestListener = function (request, res) {
     <button onclick="start()">START</button>
     <br><br><br>
     <button onclick="stop()">STOP</button></center>`;
-    res.end(html('<html><body><center>'+s+'</body></hmtl>'));
+    return html('<html><body><center>'+s+'</body></hmtl>');
   }
   if("/ssd_nvme"==uri){
     var s=""+execSync('node read.js tail_k=0.995 tail_min=32000 tail_max=99000 mode=by_recs');
-    res.writeHead(200);res.end(maps2table(s.split("\n").reverse().filter(e=>e.trim().length).map(e=>JSON.parse(e))));
+    return html(maps2table(s.split("\n").reverse().filter(e=>e.trim().length).map(e=>JSON.parse(e))));
   }
   if("/ssd_nvme_full"==uri){
     var s=""+execSync('node read.js');
-    res.writeHead(200);res.end(maps2table(s.split("\n").reverse().filter(e=>e.trim().length).map(e=>JSON.parse(e))));
+    return html(maps2table(s.split("\n").reverse().filter(e=>e.trim().length).map(e=>JSON.parse(e))));
   }
   res.writeHead(404);res.end('not found');
 }
