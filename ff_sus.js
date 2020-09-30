@@ -134,7 +134,7 @@ var pcsv2table=(pcsv,cb)=>{
 var csv2table=(str,sep,cb)=>{
   //var cb=(str,pos,pcsv,arr)=>{if(0)escapeHtml(str);return "<b>"+escapeHtml(json(pos))+"</b>";};
   var pcsv=parse_csv_with_head(str,sep);
-  return pcsv2table(pcsv,cb);
+  return pcsv2table(pcsv,cb); 
 }
 var pcsv2csv=(pcsv,sep)=>{
   sep='undefined'===typeof sep?",":sep;
@@ -181,10 +181,10 @@ var pslist2json=s=>{
 }
 
 const requestListener = function (request, res) {
-  var purl=url.parse(request.url);var uri=purl.pathname;var qp=qs.parse(purl.query);
-  var full_html=s=>'<!DOCTYPE HTML><html><head><meta charset="utf-8"></head>'+s+'</html>';
-  var html=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/html"});r.end(full_html(s));}})(res);
-  var txt=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/plain"});r.end(s);}})(res);
+  let purl=url.parse(request.url);let uri=purl.pathname;let qp=qs.parse(purl.query);
+  let full_html=s=>'<!DOCTYPE HTML><html><head><meta charset="utf-8"></head>'+s+'</html>';
+  let html=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/html"});r.end(full_html(s));}})(res);
+  let txt=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/plain"});r.end(s);}})(res);
   if(purl.path!=="/"+"favicon.ico")qap_log("url = "+purl.path);
   if("/sitemap"==uri){
     var hide="close,exit,inc,dec,del,put,get,internal,eval,tick,ping".split(",").concat("g,");
@@ -195,7 +195,7 @@ const requestListener = function (request, res) {
       ).filter(e=>hide.indexOf(e)<0).map(e=>'/'+e))
     );
   }
-  var run=fn=>""+execSync(path.normalize("../ps/"+fn));
+  let run=fn=>""+execSync(path.normalize("../ps/"+fn));
   if("/pslist"==uri){
     return txt(run("pslist -m -nobanner"));
   }
@@ -207,15 +207,15 @@ const requestListener = function (request, res) {
   }
   if("/set_cpu_maxpower"==uri){
     if('v' in qp){
-      var v=qp.v|0;if(v<20)v=20;if(v>100)v=100;
+      let v=qp.v|0;if(v<20)v=20;if(v>100)v=100;
       execSync("Powercfg -setacvalueindex scheme_current sub_processor PROCTHROTTLEMAX "+v);
       execSync("Powercfg -setactive scheme_current");
-      var msg="["+getDateTime_v2()+"]: PROCTHROTTLEMAX = "+v;
+      let msg="["+getDateTime_v2()+"]: PROCTHROTTLEMAX = "+v;
       console.log(msg);
       return txt(msg);
     }
     let s="";
-    s+="<script>var f=(api)=>()=>fetch(api);var func=v=>f('/set_cpu_maxpower?v='+v);</script>";
+    s+="<script>var f=(api)=>fetch(api);var func=v=>f('/set_cpu_maxpower?v='+v);</script>";
     s+=`<style>button{
       display: block;
       width: 50%;
@@ -238,8 +238,8 @@ const requestListener = function (request, res) {
     return txt(run("pssuspend.exe -r firefox.exe -nobanner"));
   }
   if("/GUI"==uri){
-    var s="";
-    s+="<script>var f=(api)=>()=>fetch(api);var start=f('/pssuspend/r/firefox');var stop=f('/pssuspend/s/firefox');</script>";
+    let s="";
+    s+="<script>var f=(api)=>fetch(api);var start=()=>f('/pssuspend/r/firefox');var stop=()=>f('/pssuspend/s/firefox');</script>";
     s+=`<style>button{
       display: block;
       width: 50%;
@@ -256,11 +256,11 @@ const requestListener = function (request, res) {
     return html('<body><center>'+s+'</body>');
   }
   if("/ssd_nvme"==uri){
-    var s=""+execSync('node read.js tail_k=0.995 tail_min=32000 tail_max=99000 mode=by_recs');
+    let s=""+execSync('node read.js tail_k=0.995 tail_min=32000 tail_max=99000 mode=by_recs');
     return html(maps2table(s.split("\n").reverse().filter(e=>e.trim().length).map(e=>JSON.parse(e))));
   }
   if("/ssd_nvme_full"==uri){
-    var s=""+execSync('node read.js');
+    let s=""+execSync('node read.js');
     return html(maps2table(s.split("\n").reverse().filter(e=>e.trim().length).map(e=>JSON.parse(e))));
   }
   res.writeHead(404);res.end('not found');
