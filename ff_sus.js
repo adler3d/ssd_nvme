@@ -238,11 +238,34 @@ const requestListener = function (request, res) {
     s+=btns;
     return html_body('<center>response: <pre id="out">...</pre><br><br>'+s+'</center>');
   }
-  if("/pssuspend/s/firefox"==uri){
-    return txt(run("pssuspend.exe firefox.exe -nobanner"));
-  }
-  if("/pssuspend/r/firefox"==uri){
-    return txt(run("pssuspend.exe -r firefox.exe -nobanner"));
+  let msvs_list=[
+    "devenv.exe",
+    "PerfWatson2.exe",
+    "ServiceHub.Host.Node.x86.exe",
+    //conhost.exe
+    "ServiceHub.VSDetouredHost.exe",
+    "ServiceHub.Host.CLR.x86.exe",
+    "ServiceHub.IdentityHost.exe",
+    "ServiceHub.SettingsHost.exe",
+    "ServiceHub.DataWarehouseHost.exe",
+    "ScriptedSandbox64.exe",
+    "vcpkgsrv.exe"
+  ];
+  let plist={
+    firefox:["firefox.exe"],
+    devenv:msvs_list
+  };
+  if(uri.includes("/pssuspend/")){
+    let tmp=uri.split("/pssuspend/");
+    if(tmp.length==2&&tmp[0].length==0&&tmp[1].length){
+      let a=tmp[1].split("/");
+      if(!"sr".includes(a[0]))return txt("unknow method - "+a[1]);
+      if(a.length!=2)return txt("wrong params(about slashes) - "+tmp[1]);
+      let key=a[0]==="r"?" -r":"";
+      if(!(a[1] in plist))return txt("unknow procname - "+a[1]);
+      let out=plist[a[1]].map(e=>run("pssuspend.exe"+key+" "+e+" -nobanner")).join("\n");
+      return txt(out);
+    }
   }
   if("/GUI"==uri){
     let s="";
@@ -273,6 +296,18 @@ const requestListener = function (request, res) {
   res.writeHead(404);res.end('not found');
 }
 
+let get_port=()=>{
+  let argv=process.argv.slice(2);
+  qap_log("argv = "+json(argv));
+  let oks=argv.map(e=>e.split("=")).filter(e=>e[0]==="port");
+  if(oks.length!=1)return def;
+  let p=oks[0][1]|0;
+  if((p+"")===oks[0][1])return p;
+  return def;
+}
+
+let port=get_port(80);
 const server = http.createServer(requestListener);
-server.listen(80);
-qap_log("ff_sus.js runned at localhost:80\n");
+
+server.listen(port);
+qap_log("ff_sus.js runned at localhost:"+port+"\n");
