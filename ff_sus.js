@@ -296,7 +296,7 @@ const requestListener = function (request, res) {
   res.writeHead(404);res.end('not found');
 }
 
-let get_port=()=>{
+let get_port=(def)=>{
   let argv=process.argv.slice(2);
   qap_log("argv = "+json(argv));
   let oks=argv.map(e=>e.split("=")).filter(e=>e[0]==="port");
