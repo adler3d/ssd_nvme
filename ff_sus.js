@@ -30,8 +30,14 @@ var getDateTime_v2=t=>{
   return dateTime;
 }
 
+var g_log_file=fs.openSync("fs_sus.log","a+");
+
 var qap_add_time=s=>"["+getDateTime_v2()+"] "+s;
-var qap_log=s=>console.log(qap_add_time(s));
+var qap_log=s=>{
+  let msg=qap_add_time(s);
+  fs.writeSync(g_log_file,msg+"\n");
+  console.log(msg);
+}
 
 var json=JSON.stringify;
 var mapkeys=Object.keys;var mapvals=(m)=>mapkeys(m).map(k=>m[k]);
@@ -186,7 +192,9 @@ const requestListener = function (request, res) {
   let html=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/html"});r.end(full_html(s));}})(res);
   let html_body=s=>html("<body>"+s+"</body>");
   let txt=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/plain"});r.end(s);}})(res);
-  if(purl.path!=="/"+"favicon.ico")qap_log("url = "+purl.path);
+  if(purl.path!=="/"+"favicon.ico"){
+    qap_log("url = "+purl.path);
+  }
   if("/sitemap"==uri){
     var hide="close,exit,inc,dec,del,put,get,internal,eval,tick,ping".split(",").concat("g,");
     var preproc=s=>s.split('+"/').join("*cut*");
